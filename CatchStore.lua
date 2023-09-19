@@ -4,7 +4,7 @@
 function CatchStoreLib()
     local playercs = {}
     local csroot = {
-        version = "v1.1.2",
+        version = "1.1.2",
         OnAutosaved = {},
         AutosaveRate = 3,
     }
