@@ -4,7 +4,7 @@
 function CatchStoreLib()
     local playercs = {}
     local csroot = {
-        version = "1",
+        version = "1.2",
         OnAutosaved = {},
         AutosaveRate = 3,
     }
@@ -22,6 +22,10 @@ function CatchStoreLib()
     end
 
     function csroot:CreateDS(player, prefix)
+        if playercs[player.UserID] then
+            return playercs[player.UserID]
+        end
+
         local csModule = {
             cached = {},
             changes = {},
@@ -181,7 +185,9 @@ function CatchStoreLib()
 
     game["Players"].PlayerRemoved:Connect(function (player)
         csroot:ForceSave(player)
-        playercs[player.UserID] = nil
+        if #game["Players"]:GetPlayers() <= 2 then
+            csroot:ForceSaveAll()
+        end
     end)
 
     local autosaveCallbacks = {}
@@ -193,17 +199,21 @@ function CatchStoreLib()
             local waitSec = ((60 / (30 + (10 * plrcount))) * plrcount) * csroot.AutosaveRate
             wait(waitSec)
 
-            for i, p in pairs(game["Players"]:GetPlayers()) do
-                csroot:ForceSave(p)
-            end
-
-            for k,v in pairs(autosaveCallbacks) do
-                if v then
-                    k()
-                end
-            end
+            csroot:ForceSaveAll()
         end
     end)
+
+    function csroot:ForceSaveAll()
+        for i, p in pairs(game["Players"]:GetPlayers()) do
+            csroot:ForceSave(p)
+        end
+
+        for k,v in pairs(autosaveCallbacks) do
+            if v then
+                k()
+            end
+        end
+    end
 
     function csroot.OnAutosaved:Connect(callback)
         autosaveCallbacks[callback] = true
