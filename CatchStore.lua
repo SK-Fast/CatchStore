@@ -23,7 +23,7 @@ function CatchStoreLib()
 
     function csroot:CreateDS(player, prefix)
         if playercs[player.UserID] then
-            return playercs[player.UserID]
+            return playercs[player.UserID].csModule
         end
 
         local csModule = {
